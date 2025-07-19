@@ -1,36 +1,43 @@
-﻿/*
- * CSE 212 Lesson 6C 
- * 
- * This code will analyze the NBA basketball data and create a table showing
- * the players with the top 10 career points.
- * 
- * Note about columns:
- * - Player ID is in column 0
- * - Points is in column 8
- * 
- * Each row represents the player's stats for a single season with a single team.
- */
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
-using Microsoft.VisualBasic.FileIO;
-
-public class Basketball
+public static class Basketball
 {
     public static void Run()
     {
-        var players = new Dictionary<string, int>();
+        var totalPointsPerPlayer = new Dictionary<string, int>();
 
-        using var reader = new TextFieldParser("basketball.csv");
-        reader.TextFieldType = FieldType.Delimited;
-        reader.SetDelimiters(",");
-        reader.ReadFields(); // ignore header row
-        while (!reader.EndOfData) {
-            var fields = reader.ReadFields()!;
-            var playerId = fields[0];
-            var points = int.Parse(fields[8]);
+        foreach (var line in File.ReadLines("basketball.csv").Skip(1)) // Saltar encabezado
+        {
+            var parts = line.Split(',');
+
+            string playerId = parts[0];       // Columna 0: ID del jugador
+            string pointsStr = parts[8];      // Columna 8: Puntos anotados
+
+            if (int.TryParse(pointsStr, out int points))
+            {
+                if (!totalPointsPerPlayer.ContainsKey(playerId))
+                {
+                    totalPointsPerPlayer[playerId] = points;
+                }
+                else
+                {
+                    totalPointsPerPlayer[playerId] += points;
+                }
+            }
         }
 
-        Console.WriteLine($"Players: {{{string.Join(", ", players)}}}");
+        // Obtener los 10 jugadores con más puntos totales
+        var topPlayers = totalPointsPerPlayer
+            .OrderByDescending(kvp => kvp.Value)
+            .Take(10);
 
-        var topPlayers = new string[10];
+        Console.WriteLine("Top 10 jugadores por puntos totales:");
+        foreach (var kvp in topPlayers)
+        {
+            Console.WriteLine($"{kvp.Key}: {kvp.Value} puntos");
+        }
     }
 }

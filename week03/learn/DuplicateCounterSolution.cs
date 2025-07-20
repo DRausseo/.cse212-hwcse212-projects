@@ -1,4 +1,7 @@
-﻿public class DuplicateCounterSolution
+﻿using System;
+using System.Collections.Generic;
+
+public class DuplicateCounterSolution
 {
     //CSE 212 Lesson 5C Solved
     //Count how many duplicates are in a collection of data.

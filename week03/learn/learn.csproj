@@ -3,18 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Archivos compartidos (ubicados en la carpeta 'code') -->
-    <Compile Include="..\code\SetsAndMaps.cs" />
-    <Compile Include="..\code\FeatureCollection.cs" />
     <Compile Include="..\code\Maze.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
   </ItemGroup>
 
 </Project>

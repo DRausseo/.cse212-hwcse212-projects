@@ -18,6 +18,6 @@ public class EarthquakeProperties
     public string Place { get; set; }
 
     [JsonPropertyName("mag")]
-    public double Mag { get; set; }
+    public double? Mag { get; set; }
 }
 

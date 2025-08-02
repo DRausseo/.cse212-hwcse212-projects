@@ -1,8 +1,8 @@
-using System.Text.Json;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Net.Http;
-
+using System.Collections.Generic;
+using System.Text.Json;
 
 public static class SetsAndMaps
 {
@@ -25,19 +25,26 @@ public static class SetsAndMaps
     /// <param name="words">An array of 2-character words (lowercase, no duplicates)</param>
     public static string[] FindPairs(string[] words)
     {
-        var seen = new HashSet<string>(words);
+        var seen = new HashSet<string>();
         var result = new List<string>();
 
         foreach (var word in words)
         {
-            if (word[0] == word[1]) continue; // ignorar como "aa"
+            if (word[0] == word[1]) continue;
 
             var reversed = new string(new[] { word[1], word[0] });
+
             if (seen.Contains(reversed))
             {
-                result.Add($"{word} & {reversed}");
-                seen.Remove(word);
-                seen.Remove(reversed); // evita duplicados
+                var pair = string.Compare(word, reversed) < 0
+                    ? $"{word} & {reversed}"
+                    : $"{reversed} & {word}";
+
+                result.Add(pair);
+            }
+            else
+            {
+                seen.Add(word);
             }
         }
 
@@ -61,9 +68,15 @@ public static class SetsAndMaps
         foreach (var line in File.ReadLines(filename))
         {
             var fields = line.Split(",");
-            // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length > 3)
+            {
+                var degree = fields[3].Trim();
+                if (degrees.ContainsKey(degree))
+                    degrees[degree]++;
+                else
+                    degrees[degree] = 1;
+            }
         }
-
         return degrees;
     }
 
@@ -85,8 +98,37 @@ public static class SetsAndMaps
     /// </summary>
     public static bool IsAnagram(string word1, string word2)
     {
-        // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        string Normalize(string word) =>
+            word.Replace(" ", "").ToLower();
+
+        word1 = Normalize(word1);
+        word2 = Normalize(word2);
+
+        if (word1.Length != word2.Length)
+            return false;
+
+        var charCount = new Dictionary<char, int>();
+
+        foreach (char c in word1)
+        {
+            if (charCount.ContainsKey(c))
+                charCount[c]++;
+            else
+                charCount[c] = 1;
+        }
+
+        foreach (char c in word2)
+        {
+            if (!charCount.ContainsKey(c))
+                return false;
+
+            charCount[c]--;
+
+            if (charCount[c] < 0)
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -115,11 +157,26 @@ public static class SetsAndMaps
 
         var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
 
-        // TODO Problem 5:
-        // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
-        // on those classes so that the call to Deserialize above works properly.
-        // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
-        // 3. Return an array of these string descriptions.
-        return [];
+        if (featureCollection?.Features == null)
+            return Array.Empty<string>();
+
+        var result = new List<string>();
+        foreach (var feature in featureCollection.Features)
+        {
+            string place = feature.Properties.Place;
+            double? mag = feature.Properties.Mag;
+
+            if (!string.IsNullOrEmpty(place) && mag.HasValue)
+            {
+                result.Add($"{place} - Mag {mag}");
+
+            }
+        }
+
+        return result.ToArray();
     }
 }
+// 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
+// on those classes so that the call to Deserialize above works properly.
+// 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
+// 3. Return an array of these string descriptions. 
